@@ -22,22 +22,21 @@ Enter answers to the questions just below the >Answer: prompt.
 
 1. What are your previous experiences with data analytics, R, and Git? Include both formal and informal training.
 
-> Answer: 
+> Answer: I have formal training in R, which I used extensively in a statistics class for data manipulation and analysis. Additionally, I've used Git in a computer science course and for various coding projects, managing version control and collaborating with others.
 
 2. Are there any components of the course about which you feel confident?
 
-> Answer: 
+> Answer: I feel confident in handling different data types and am familiar with their applications, particularly in ecology and sociology topics. My experience with these data types has been strengthened through various projects and coursework.
 
 3. Are there any components of the course about which you feel apprehensive?
 
-> Answer: 
-
+> Answer:  I’m a bit apprehensive about areas that might require advanced statistical techniques or unfamiliar tools.
 
 ## 2) GitHub
 
 Provide a link below to your forked course repository in GitHub. Make sure you have pulled all recent changes from the course repository and that you have updated your course README file, committed those changes, and pushed them to your GitHub account. 
 
-> Answer: 
+> Answer: <https://github.com/Weilin229/EDE_Fall2024.git>
 
 ## 3) Knitting
 When you have completed this document, click the `knit` button.This should produce a PDF copy of your markdown document. Submit this PDF to Canvas 
