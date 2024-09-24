@@ -33,7 +33,22 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Ex
 1.  Load necessary packages (tidyverse, lubridate, here), check your current working directory and upload two datasets: the ECOTOX neonicotinoid dataset (ECOTOX_Neonicotinoids_Insects_raw.csv) and the Niwot Ridge NEON dataset for litter and woody debris (NEON_NIWO_Litter_massdata_2018-08_raw.csv). Name these datasets "Neonics" and "Litter", respectively. Be sure to include the subcommand to read strings in as factors.
 
 ```{r,  message = FALSE}
+# Load necessary packages
+library(tidyverse)
+library(lubridate)
+library(here)
 
+# Check current working directory
+getwd()
+
+# Load the datasets, reading strings as factors
+Neonics <- read_csv(here("Data", "Raw", "ECOTOX_Neonicotinoids_Insects_raw.csv"), col_types = cols(.default = col_factor()))
+
+Litter <- read_csv(here("Data", "Raw","NEON_NIWO_Litter_massdata_2018-08_raw.csv"), col_types = cols(.default = col_factor()))
+
+# Confirm datasets have been loaded correctly
+head(Neonics)
+head(Litter)
 
 ```
 
@@ -41,68 +56,89 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Ex
 
 2.  The neonicotinoid dataset was collected from the Environmental Protection Agency's ECOTOX Knowledgebase, a database for ecotoxicology research. Neonicotinoids are a class of insecticides used widely in agriculture. The dataset that has been pulled includes all studies published on insects. Why might we be interested in the ecotoxicology of neonicotinoids on insects? Feel free to do a brief internet search if you feel you need more background information.
 
-> Answer:
+> Answer: Neonicotinoids are a class of systemic insecticides that affect the nervous systems of insects, leading to paralysis and death. Their use has been linked to Pollinator Decline. Pollinators like bees play a critical role in agriculture by pollinating crops, and their decline can have significant consequences for food production and biodiversity. The second effect could be water and Soil Contamination.These chemicals can persist in the environment, contaminating water bodies and soil, thus affecting aquatic insects and other invertebrates as well.
 
 3.  The Niwot Ridge litter and woody debris dataset was collected from the National Ecological Observatory Network, which collectively includes 81 aquatic and terrestrial sites across 20 ecoclimatic domains. 32 of these sites sample forest litter and woody debris, and we will focus on the Niwot Ridge long-term ecological research (LTER) station in Colorado. Why might we be interested in studying litter and woody debris that falls to the ground in forests? Feel free to do a brief internet search if you feel you need more background information.
 
-> Answer:
+> Answer: Studying litter and woody debris in forests is crucial for understanding nutrient cycling, carbon storage, and ecosystem dynamics. As organic matter like leaves, twigs, and fallen branches decompose, they release nutrients back into the soil, which supports plant growth and maintains soil fertility. Additionally, woody debris plays a key role in carbon sequestration, acting as a temporary carbon sink and influencing the forest's capacity to mitigate climate change, while also providing habitat for various organisms and contributing to overall biodiversity.
 
 4.  How is litter and woody debris sampled as part of the NEON network? Read the NEON_Litterfall_UserGuide.pdf document to learn more. List three pieces of salient information about the sampling methods here:
 
 > Answer: 
- 1.
- 2.
- 3. 
+ 1.Litter Traps
+ 2.Sampling Frequency
+ 3. Woody Debris Transects
 
 ## Obtain basic summaries of your data (Neonics)
 
 5.  What are the dimensions of the dataset?
 
 ```{r}
+dim(Neonics)
 
+dim(Litter)
 
 ```
 
 6.  Using the `summary` function on the "Effect" column, determine the most common effects that are studied. Why might these effects specifically be of interest? [Tip: The `sort()` command is useful for listing the values in order of magnitude...]
 
 ```{r}
+effect_summary <- summary(Neonics$Effect)
+sorted_effect_summary <- sort(effect_summary, decreasing = TRUE)
 
+sorted_effect_summary
 
 ```
 
-> Answer:
+> Answer:These effects are of particular interest because they directly influence insect population dynamics, survival rates, and their ecological roles. Studying mortality helps assess the immediate lethality of neonicotinoids, while behavioral changes and reproductive impairment provide insights into sub-lethal, long-term impacts that may affect insect populations and ecosystem balance over time.
 
 
 7.  Using the `summary` function, determine the six most commonly studied species in the dataset (common name). What do these species have in common, and why might they be of interest over other insects? Feel free to do a brief internet search for more information if needed.[TIP: Explore the help on the `summary()` function, in particular the `maxsum` argument...]
 
 ```{r}
-
+summary(Neonics$`Species Common Name`, maxsum = 6)
 
 ```
 
-> Answer:
+> Answer:The six most commonly studied species might include honey bees, houseflies, mosquitoes, fruit flies, aphids, and beetles. These species are of interest because they either serve crucial ecological roles or are major agricultural pests.
 
 8.  Concentrations are always a numeric value. What is the class of `Conc.1..Author.` column in the dataset, and why is it not numeric? [Tip: Viewing the dataframe may be helpful...]
 
 ```{r}
+class(Neonics$`Conc 1 (Author).`)
 
-
+head(Neonics$`Conc 1 (Author)`)
 ```
 
-> Answer:
+> Answer:column may not be numeric because it could contain non-numeric characters such as units or symbols like "<" indicating less than or greater than concentrations. These characters would prevent R from recognizing the column as numeric. 
 
 ## Explore your data graphically (Neonics)
 
 9.  Using `geom_freqpoly`, generate a plot of the number of studies conducted by publication year.
 
 ```{r}
+# Load necessary library
+library(ggplot2)
 
+ggplot(Neonics, aes(x = as.numeric(`Publication Year`))) +
+  geom_freqpoly(binwidth = 1, color = "blue") +
+  labs(title = "Number of Studies by Publication Year",
+       x = "Publication Year",
+       y = "Number of Studies") +
+  theme_minimal()
 
 ```
 
 10. Reproduce the same graph but now add a color aesthetic so that different Test.Location are displayed as different colors.
 
 ```{r}
+# Convert Publication Year to numeric and generate the plot with color by Test Location
+ggplot(Neonics, aes(x = as.numeric(`Publication Year`), color = `Test Location`)) +
+  geom_freqpoly(binwidth = 1) +
+  labs(title = "Number of Studies by Publication Year (Colored by Test Location)",
+       x = "Publication Year",
+       y = "Number of Studies") +
+  theme_minimal()
 
 
 ```
