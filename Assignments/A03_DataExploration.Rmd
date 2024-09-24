@@ -33,20 +33,16 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Ex
 1.  Load necessary packages (tidyverse, lubridate, here), check your current working directory and upload two datasets: the ECOTOX neonicotinoid dataset (ECOTOX_Neonicotinoids_Insects_raw.csv) and the Niwot Ridge NEON dataset for litter and woody debris (NEON_NIWO_Litter_massdata_2018-08_raw.csv). Name these datasets "Neonics" and "Litter", respectively. Be sure to include the subcommand to read strings in as factors.
 
 ```{r,  message = FALSE}
-# Load necessary packages
 library(tidyverse)
 library(lubridate)
 library(here)
 
-# Check current working directory
 getwd()
 
-# Load the datasets, reading strings as factors
 Neonics <- read_csv(here("Data", "Raw", "ECOTOX_Neonicotinoids_Insects_raw.csv"), col_types = cols(.default = col_factor()))
 
 Litter <- read_csv(here("Data", "Raw","NEON_NIWO_Litter_massdata_2018-08_raw.csv"), col_types = cols(.default = col_factor()))
 
-# Confirm datasets have been loaded correctly
 head(Neonics)
 head(Litter)
 
@@ -117,7 +113,6 @@ head(Neonics$`Conc 1 (Author)`)
 9.  Using `geom_freqpoly`, generate a plot of the number of studies conducted by publication year.
 
 ```{r}
-# Load necessary library
 library(ggplot2)
 
 ggplot(Neonics, aes(x = as.numeric(`Publication Year`))) +
@@ -132,68 +127,102 @@ ggplot(Neonics, aes(x = as.numeric(`Publication Year`))) +
 10. Reproduce the same graph but now add a color aesthetic so that different Test.Location are displayed as different colors.
 
 ```{r}
-# Convert Publication Year to numeric and generate the plot with color by Test Location
 ggplot(Neonics, aes(x = as.numeric(`Publication Year`), color = `Test Location`)) +
   geom_freqpoly(binwidth = 1) +
-  labs(title = "Number of Studies by Publication Year (Colored by Test Location)",
+  labs(title = "Number of Studies by Publication Year",
        x = "Publication Year",
        y = "Number of Studies") +
   theme_minimal()
-
 
 ```
 
 Interpret this graph. What are the most common test locations, and do they differ over time?
 
-> Answer:
+> Answer:The graph shows that laboratory studies are the most common, especially in the earlier years, while natural field studies become more prevalent over time. There is a noticeable shift from lab-based research toward more field-based studies, suggesting a growing interest in real-world ecological impacts. Studies conducted in artificial or undeterminable field environments remain consistently low throughout the observed period.
 
 11. Create a bar graph of Endpoint counts. What are the two most common end points, and how are they defined? Consult the ECOTOX_CodeAppendix for more information. 
 
 [**TIP**: Add `theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))` to the end of your plot command to rotate and align the X-axis labels...]
 
 ```{r}
-
-
+ggplot(Neonics, aes(x = `Endpoint`)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Counts of Endpoints in the Dataset",
+       x = "Endpoint",
+       y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
-> Answer:
+> Answer:because they help determine the levels at which substances start causing observable harm (LOEL) and provide a measure of the substance’s toxicity (LC50), which is essential for understanding the risk posed by neonicotinoids to insect populations.
 
 ## Explore your data (Litter)
 
 12. Determine the class of collectDate. Is it a date? If not, change to a date and confirm the new class of the variable. Using the `unique` function, determine which dates litter was sampled in August 2018.
 
 ```{r}
+class(Litter$collectDate)
 
+Litter$collectDate <- as.Date(Litter$collectDate)
+
+class(Litter$collectDate)
+
+unique(Litter$collectDate[format(Litter$collectDate, "%Y-%m") == "2018-08"])
 
 ```
 
 13. Using the `unique` function, determine how many different plots were sampled at Niwot Ridge. How is the information obtained from `unique` different from that obtained from `summary`?
 
 ```{r}
+unique_plots <- unique(Litter$plotID)
+
+length(unique_plots)
 
 
 ```
 
-> Answer:
+> Answer:unique helps you directly identify how many distinct plots were sampled, while summary would give the counts of how frequently each plot appears in the dataset but not directly the number of unique plots
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
 ```{r}
-
+ggplot(Litter, aes(x = functionalGroup)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Counts of Functional Groups of Litter at Niwot Ridge",
+       x = "Functional Group",
+       y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 ```
 
 15. Using `geom_boxplot` and `geom_violin`, create a boxplot and a violin plot of dryMass by functionalGroup.
 
 ```{r}
+Litter$dryMass <- as.numeric(Litter$dryMass)
 
+ggplot(Litter, aes(x = functionalGroup, y = dryMass)) +
+  geom_boxplot(fill = "lightblue") +
+  scale_y_log10() +  # Use log10 scale for better visualization if the range of dryMass is large
+  labs(title = "Boxplot of Dry Mass by Functional Group",
+       x = "Functional Group",
+       y = "Dry Mass (g, log scale)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
+ggplot(Litter, aes(x = functionalGroup, y = dryMass)) +
+  geom_violin(fill = "lightgreen") +
+  labs(title = "Violin Plot of Dry Mass by Functional Group",
+       x = "Functional Group",
+       y = "Dry Mass (g)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
 Why is the boxplot a more effective visualization option than the violin plot in this case?
 
-> Answer:
+> Answer: the boxplot is a more effective visualization because it clearly shows the median, quartiles, and potential outliers of the dryMass distribution for each functional group, which are essential for comparing central tendencies and data spread. The violin plot, while useful for showing the distribution's shape, can be harder to interpret when comparing specific statistical summaries across groups.
 
 What type(s) of litter tend to have the highest biomass at these sites?
 
-> Answer:
+> Answer:twigs/branches and woody material tend to have the highest biomass at these sites. The upper ranges for these functional groups show higher dry mass values compared to other types of litter like seeds, flowers, and needles. This suggests that larger, denser materials such as branches and woody debris contribute more significantly to litter biomass at Niwot Ridge.
